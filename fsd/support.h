@@ -50,7 +50,6 @@ char *sprintgmt(time_t now, char *buf);
 char *sprintgmtdate(time_t now, char *buf);
 int mconnect(int, struct sockaddr *, int, int);
 void dblog(char *, int);
-void starttimer();
 time_t mtime();
 void msrand(int);
 int mrand();

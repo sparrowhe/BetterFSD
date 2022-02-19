@@ -182,26 +182,6 @@ time_t mtime()
    /*return timer;*/
    return time(NULL);
 }
-void starttimer()
-{
-/* We try without all signal/timer stuff this release */
-/*
-
-   struct itimerval t;
-   struct sigaction act;
-   sigset_t set;
-   act.sa_handler=handlealarm;
-
-   sigemptyset(&set);
-   act.sa_mask=set;
-
-   act.sa_flags=SA_RESTART; 
-   sigaction(SIGALRM, &act, NULL);
-   t.it_value.tv_sec=1, t.it_value.tv_usec=0;
-   t.it_interval.tv_sec=1, t.it_interval.tv_usec=0;
-   setitimer(ITIMER_REAL, &t, NULL);
-*/
-}
 char *sprinttime(time_t now, char *buf)
 {
    int s=now%60, m=(now%3600)/60, h=now/3600;

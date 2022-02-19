@@ -20,11 +20,8 @@ void run(char *configfile)
 }
 void dosignals()
 {
-   starttimer();
-#ifndef WIN32
    signal(SIGPIPE, SIG_IGN);
    signal(SIGHUP, SIG_IGN);
-#endif
 }
 
 #ifdef WIN32
@@ -254,7 +251,6 @@ void dosignals()
 		 /*daemon(0, 0);*/
 	   }
    
-	   dosignals();
 	   run(configfile);
 	}
 #endif
