@@ -153,11 +153,18 @@ void mm::buildlist()
 void mm::setupnewfile()
 {
    newfileready=0;
+   if (metarsize<100000)
+   {
+      unlink(METARFILENEW);
+      dolog(L_WARNING, "METAR: Size of new METAR file (%d) is too small, dropping.",
+         metarsize);
+      return;
+   }
    unlink(METARFILE);
    if (rename(METARFILENEW, METARFILE))
       dolog(L_ERR, "METAR: Can't move %s to %s: %s",METARFILENEW, METARFILE, 
       strerror(errno));
-      stopdownload();
+   else dolog(L_INFO,"METAR: Installed new METAR data.");
    buildlist();
    manager->setvar(varprev, time(NULL));
 }
@@ -188,6 +195,7 @@ void mm::startdownload()
    char *s, cv[100];
    if (downloading)
    {
+      dolog(L_ERR, "METAR: server seems to be still loading");
       return;
    }
    prevdownload=mtime();
@@ -314,6 +322,7 @@ void mm::dodownload()
 	    				   struct tm *tp=gmtime(&now);
 						   sprintf(data,"RETR %02dZ.TXT\n",(tp->tm_hour+21)%24);
 						   WRITESOCK(sock, data, strlen(data));
+						   dolog(L_INFO,"METAR: Starting download of METAR data");
 						}
 					}
 			   }
