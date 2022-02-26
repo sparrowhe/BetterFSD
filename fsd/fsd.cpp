@@ -205,11 +205,14 @@ void fsd::dochecks()
 }
 void fsd::run()
 {
-   pmanager->run();
-   if (timer!=mtime())
+   while (1)
    {
-      timer=mtime();
-      dochecks();
+      pmanager->run();
+      if (timer!=mtime())
+      {
+         timer=mtime();
+         dochecks();
+      }
    }
 }
 void fsd::configmyserver()

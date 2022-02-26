@@ -16,7 +16,7 @@
 void run(char *configfile)
 {
    fsd fsdserver(configfile);
-   while (1) fsdserver.run();
+   fsdserver.run();
 }
 void dosignals()
 {
