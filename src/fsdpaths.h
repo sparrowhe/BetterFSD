@@ -1,6 +1,3 @@
-#ifdef __GNUC__
-#ident "$Id: fsdpaths.h,v 2.01 1998/11/19 10:18:14 marty Exp $"
-#endif
 #ifndef FSDPATHSHH
 #define FSDPATHSHH
 

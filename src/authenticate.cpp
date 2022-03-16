@@ -2,10 +2,6 @@
  * Authentication routines for validating network connections.
  */
 
-#ifdef __GNUC__
-# ident "$Id: authenticate.c,v 2.01 1998/11/19 10:18:12 marty Exp $"
-#endif
-
 #ifdef WIN32
 	#include <stdlib.h>
 	#include <string.h>
@@ -52,7 +48,7 @@ auth_validate_ip(struct sockaddr_in *sa)
     /* XXX log something */
     return 1;
   }
-  fqdn = malloc(strlen(ips) + sizeof(RBL_DOMAIN));
+  fqdn = (char*)malloc(strlen(ips) + sizeof(RBL_DOMAIN));
   if (fqdn == NULL) {
     /* XXX log something */
     return 1;
