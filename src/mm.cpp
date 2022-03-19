@@ -238,7 +238,7 @@ void mm::startdownload()
    getsockname(sock, (struct sockaddr *)&dataadr, &name);
    unsigned long adr=ntohl((unsigned long)dataadr.sin_addr.s_addr);
 
-   sprintf(port, "%d,%d,%d,%d,%d,%d", (adr>>24)&0xff, (adr>>16)&0xff,
+   sprintf(port, "%ld,%ld,%ld,%ld,%d,%d", (adr>>24)&0xff, (adr>>16)&0xff,
       (adr>>8)&0xff, adr&0xff, (portnum>>8)&0xff, portnum&0xff);
 
    time_t now=time(NULL);

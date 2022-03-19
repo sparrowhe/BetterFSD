@@ -254,7 +254,7 @@ void servinterface::sendweather(char *dest, int fd, wprofile *w)
       }
    }
    int x;
-   char data[1000]="", piece[100];
+   char data[1500]="", piece[100];
    char weather[1000];
    w->print(weather);
    sprintf(data,"%s:%d:%s", w->name, fd, weather);
@@ -310,9 +310,9 @@ void servinterface::sendnowx(char *dest, int fd, char *station)
 }
 void servinterface::sendaddwp(absuser *direction, wprofile *wp)
 {
-   char buf[1000], weather[1000];
+   char buf[2000], weather[1000];
    wp->print(weather);
-   sprintf(buf, "%s:%u:%s:%s", wp->name, wp->version, wp->origin, weather);
+   sprintf(buf, "%s:%lu:%s:%s", wp->name, wp->version, wp->origin, weather);
    sendpacket(NULL, direction, CMD_ADDWPROF, "*", serverident, packetcount,
       0, 0, buf);
    incpacketcount();

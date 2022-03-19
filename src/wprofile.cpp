@@ -241,9 +241,9 @@ int wprofile::parsevis(char **array, int count)
 int wprofile::parsewx(char **array, int count)
 {
    int amount=0, x;
-   char *patterns[]={"+", "-", "VC", "MI", "BL", "PR", "SH", "BC", "TS", "DR",
-      "FZ", "DZ", "OC", "UP", "RA", "PE", "SN", "GR", "SG", "GS", "BR", "DU",
-      "FG", "SA", "FU", "HZ", "VA", "PY", "PO", "DS", "SQ", "FC", "SS", "PLUS",
+   char *patterns[]={(char*)"+", (char*)"-", (char*)"VC", (char*)"MI", (char*)"BL", (char*)"PR", (char*)"SH", (char*)"BC", (char*)"TS", (char*)"DR",
+      (char*)"FZ", (char*)"DZ", (char*)"OC", (char*)"UP", (char*)"RA", (char*)"PE", (char*)"SN", (char*)"GR", (char*)"SG", (char*)"GS", (char*)"BR", (char*)"DU",
+      (char*)"FG", (char*)"SA", (char*)"FU", (char*)"HZ", (char*)"VA", (char*)"PY", (char*)"PO", (char*)"DS", (char*)"SQ", (char*)"FC", (char*)"SS", (char*)"PLUS",
        NULL};
    do
    {
@@ -257,7 +257,7 @@ int wprofile::parsewx(char **array, int count)
 int wprofile::parsesky(char **array, int count)
 {
    int amount=0, x;
-   char *patterns[]={"SKC", "CLR",  "VV",  "FEW",  "SCT",  "BKN",  "OVC", NULL};
+   char *patterns[]={(char*)"SKC", (char*)"CLR",  (char*)"VV",  (char*)"FEW",  (char*)"SCT",  (char*)"BKN",  (char*)"OVC",  NULL};
    int coverage[]=  {    0,     0,     8,      1,      3,      5,      8, 0   };
    do
    {

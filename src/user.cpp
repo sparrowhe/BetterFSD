@@ -276,7 +276,7 @@ void absuser::setprompt(char *s)
 void absuser::printprompt()
 {
    if (!prompt||killflag||blocked) return;
-   uprintf("%s",prompt);
+   uprintf((char*)"%s",prompt);
 }
 void absuser::kill(int reason)
 {

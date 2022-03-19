@@ -43,7 +43,7 @@ void addfile(char *name, char *string,...)
    va_start(ap,string);
    vsprintf(buf,string,ap);
    va_end(ap);
-   fprintf(logfile, buf);
+   fprintf(logfile, "%s", buf);
    fclose(logfile);
 }
 
