@@ -28,5 +28,6 @@ add_executable(fsd
 find_package(SQLite3 REQUIRED)
 target_link_libraries(fsd sqlite3)
 
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set_property(TARGET fsd PROPERTY CMAKE_CXX_STANDARD 17)
+set_property(TARGET fsd PROPERTY CMAKE_CXX_STANDARD_REQUIRED ON)
+set_property(TARGET fsd PROPERTY VS_PACKAGE_REFERENCES "SQLite_3.13.0")
