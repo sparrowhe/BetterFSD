@@ -59,6 +59,7 @@ fsd::fsd(char *configfile)
 }
 fsd::~fsd()
 {
+   sqlite3_close(certdb);
    delete clientinterface;
    delete serverinterface;
    delete systeminterface;
@@ -295,60 +296,79 @@ void fsd::configure()
       if ((entry=sysgroup->getentry("certificates"))!=NULL)
          certfile=strdup(entry->getdata());
       if ((entry=sysgroup->getentry("whazzup"))!=NULL)
-		 whazzupfile=strdup(entry->getdata());
+	    	 whazzupfile=strdup(entry->getdata());
    }
    configmyserver();
+   initdb();
    readcert();
 }
-void fsd::handlecidline(char *line)
+int fsd::handlecidline(void *data, int argc, char **argv, char **azColName)
 {
+   if (strcmp(azColName[0], "callsign")||strcmp(azColName[1], "password")||strcmp(azColName[2], "level"))
+   {
+      dolog(L_ERR, "Invaild cert database format");
+      return 1;
+   }
+   char *cid=argv[0], *pwd=argv[1];
+   int level=atoi(argv[2]);
    certificate *tempcert;
-   int mode, level;
-   char *array[4], *cid, *pwd;
-   if (line[0]==';'||line[0]=='#') return;
-   if (breakargs(line, array, 4)<3) return;
-   cid=array[0], level=atoi(array[2]), pwd=array[1];
+   int mode;
    tempcert=getcert(cid);
    if (!tempcert)
    {
       tempcert=new certificate(cid, pwd, level, mgmtime(), myserver->ident);
       mode=CERT_ADD;
-   } else
-   {
+   } else {
       tempcert->livecheck=1;
-      if (!STRCASECMP(tempcert->password, pwd)&&level==tempcert->level)
-         return;
+      if (strcmp(tempcert->password, pwd)||level==tempcert->level)
+         return 0;
       tempcert->configure(pwd, level, mgmtime(), myserver->ident);
       mode=CERT_MODIFY;
    }
    if (serverinterface) serverinterface->sendcert("*", mode, tempcert, NULL);
+   return 0;
+}
+void fsd::initdb()
+{
+   if (!certfile) return;
+   int rc;
+
+   rc = sqlite3_open(certfile, &certdb);
+
+   if (rc) {
+      dolog(L_ERR, "Can't open database: %s", sqlite3_errmsg(certdb));
+      sqlite3_close(certdb);
+      return;
+   }
+
+   char *zErrMsg = 0;
+   rc = sqlite3_exec(certdb, "CREATE TABLE cert(callsign TEXT PRIMARY KEY NOT NULL, password TEXT NOT NULL, level INT NOT NULL);", (int (*)(void *, int, char**, char**))NULL, 0, &zErrMsg);
+   if( rc != SQLITE_OK ){
+      sqlite3_free(zErrMsg);
+   }
 }
 void fsd::readcert()
 {
-   if (!certfile) return;
-   FILE *io=fopen(certfile, "r");
-   if (!io) dolog(L_ERR, "Could not open certificate file '%s'",
-      certfile); else
+   char *zErrMsg = 0;
+   certificate *temp;
+   for (temp=rootcert;temp;temp=temp->next)
+      temp->livecheck=0;
+   dolog(L_INFO, "Reading certificates from '%s'", certfile);
+   int rc = sqlite3_exec(certdb, "SELECT * FROM cert", handlecidline, (void*)NULL, &zErrMsg);
+   if (rc != SQLITE_OK) {
+      dolog(L_ERR, "SQL error: %s", zErrMsg);
+      sqlite3_free(zErrMsg);
+   }
+   temp=rootcert;
+   while (temp)
    {
-      certificate *temp;
-      for (temp=rootcert;temp;temp=temp->next)
-         temp->livecheck=0;
-      char line[1000];
-      dolog(L_INFO, "Reading certificates from '%s'", certfile);
-      while (fgets(line, 1000, io))
-         handlecidline(line);
-      fclose(io);
-      temp=rootcert;
-      while (temp)
+      certificate *next=temp->next;
+      if (!temp->livecheck)
       {
-         certificate *next=temp->next;
-         if (!temp->livecheck)
-         {
-            serverinterface->sendcert("*", CERT_DELETE, temp, NULL);
-            delete temp;
-         }
-         temp=next;
+         serverinterface->sendcert("*", CERT_DELETE, temp, NULL);
+         delete temp;
       }
+      temp=next;
    }
 }
 void fsd::createmanagevars()

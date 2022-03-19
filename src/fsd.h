@@ -7,6 +7,7 @@
 #include "process.h"
 #include "config.h"
 #include <ctime>
+#include <sqlite3.h>
 
 class fsd
 {
@@ -15,12 +16,13 @@ class fsd
    char *certfile;
    char *whazzupfile;
    time_t timer, prevnotify, prevlagcheck, certfilestat, prevcertcheck;
+   sqlite3 *certdb;
    void configmyserver();
    void configure();
    void createmanagevars();
    void createinterfaces();
    void readcert();
-   void handlecidline(char *);
+   static int handlecidline(void *, int, char **, char **);
    void makeconnections();
    void dochecks();
    void initdb();

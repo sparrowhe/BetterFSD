@@ -6,6 +6,6 @@
 #define PATH_FSD_MOTD "motd.txt"
 #define LOGFILE  "log.txt"
 #define METARFILE "metar.txt"
-#define METARFILENEW  "metarnew.txt"
+#define METARFILENEW  ".metarnew.txt"
 
 #endif

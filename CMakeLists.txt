@@ -25,5 +25,8 @@ add_executable(fsd
         src/user.cpp
         src/wprofile.cpp)
 
+find_package(SQLite3 REQUIRED)
+target_link_libraries(fsd sqlite3)
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
