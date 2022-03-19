@@ -20,7 +20,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-
+    - if: runner.os == 'Windows'
+      name: Install SQLite
+      run: Install-Package SQLite -Version 3.13.0
+      
     - name: Configure CMake
       run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
 
