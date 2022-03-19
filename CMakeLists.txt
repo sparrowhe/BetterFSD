@@ -29,7 +29,7 @@ if (UNIX)
 find_package(SQLite3 REQUIRED)
 endif (UNIX)
 if (MSVC)
-set_property(TARGET fsd PROPERTY VS_PACKAGE_REFERENCES "SQLite_3.13.0")
+set_property(TARGET fsd PROPERTY VS_PACKAGE_REFERENCES "System.Data.SQLite.Core_1.0.115.5")
 endif (MSVC)
 target_link_libraries(fsd sqlite3)
 
