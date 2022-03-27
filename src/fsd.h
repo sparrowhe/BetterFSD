@@ -17,6 +17,8 @@ class fsd
    char *whazzupfile;
    time_t timer, prevnotify, prevlagcheck, certfilestat, prevcertcheck;
    sqlite3 *certdb;
+   int dbrc;
+   char *dbErrMsg=0;
    void configmyserver();
    void configure();
    void createmanagevars();

@@ -52,9 +52,8 @@ fsd::fsd(char *configfile)
    makeconnections();
 
    dolog(L_INFO,"We are up");
-   prevnotify=prevlagcheck=timer=mtime();
+   prevnotify=prevlagcheck=prevcertcheck=prevwhazzup=timer=mtime();
 
-   prevwhazzup=mtime();
    fileopen=0;
 }
 fsd::~fsd()
@@ -93,15 +92,13 @@ void fsd::dochecks()
       configgroup *sysgroup=configman->getgroup("system");
       if (sysgroup) if ((entry=sysgroup->getentry("certificates"))!=NULL)
       {
-         if (certfile) free(certfile);
-         certfile=strdup(entry->getdata());
-         struct stat buf;
          prevcertcheck=now;
-         if (!stat(certfile, &buf)) if (buf.st_mtime!=certfilestat)
-         {
-            certfilestat=buf.st_mtime;
-            readcert();
-         }
+         readcert();
+      } else if (strdup(entry->getdata()) != certfile) {
+         prevcertcheck=now;
+         certfile=strdup(entry->getdata());
+         initdb();
+         readcert();
       }
    }
 // WhazzUp Start
@@ -331,33 +328,31 @@ int fsd::handlecidline(void *data, int argc, char **argv, char **azColName)
 void fsd::initdb()
 {
    if (!certfile) return;
-   int rc;
+   dbrc = sqlite3_open(certfile, &certdb);
 
-   rc = sqlite3_open(certfile, &certdb);
-
-   if (rc) {
+   if (dbrc) {
       dolog(L_ERR, "Can't open database: %s", sqlite3_errmsg(certdb));
       sqlite3_close(certdb);
       return;
    }
 
-   char *zErrMsg = 0;
-   rc = sqlite3_exec(certdb, "CREATE TABLE cert(callsign TEXT PRIMARY KEY NOT NULL, password TEXT NOT NULL, level INT NOT NULL);", (int (*)(void *, int, char**, char**))NULL, 0, &zErrMsg);
-   if( rc != SQLITE_OK ){
-      sqlite3_free(zErrMsg);
+   dbrc = sqlite3_exec(certdb, "CREATE TABLE cert(callsign TEXT PRIMARY KEY NOT NULL, password TEXT NOT NULL, level INT NOT NULL);", (int (*)(void *, int, char**, char**))NULL, 0, &dbErrMsg);
+   if (dbrc != SQLITE_OK) {
+      sqlite3_free(dbErrMsg);
    }
 }
 void fsd::readcert()
 {
-   char *zErrMsg = 0;
+   if (!certfile) return;
    certificate *temp;
    for (temp=rootcert;temp;temp=temp->next)
       temp->livecheck=0;
    dolog(L_INFO, "Reading certificates from '%s'", certfile);
-   int rc = sqlite3_exec(certdb, "SELECT * FROM cert", handlecidline, (void*)NULL, &zErrMsg);
-   if (rc != SQLITE_OK) {
-      dolog(L_ERR, "SQL error: %s", zErrMsg);
-      sqlite3_free(zErrMsg);
+   dbrc = sqlite3_exec(certdb, "SELECT * FROM cert", handlecidline, (void*)NULL, &dbErrMsg);
+   if (dbrc != SQLITE_OK) {
+      dolog(L_ERR, "SQL error: %s", dbErrMsg);
+      sqlite3_free(dbErrMsg);
+      return;
    }
    temp=rootcert;
    while (temp)
