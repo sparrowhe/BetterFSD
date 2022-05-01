@@ -154,7 +154,7 @@ void fsd::dochecks()
                   if (tempflightplan && tempclient->type==CLIENT_PILOT)
                      sprintf(dataseg,"%s:%s:%d:%s:%s:%s:%d:%c:%d:%d:%d:%d:%d:%d:%s:%s:%s:", dataseg, tempflightplan->aircraft, tempflightplan->tascruise, tempflightplan->depairport, tempflightplan->alt, tempflightplan->destairport, tempflightplan->revision, tempflightplan->type, tempflightplan->deptime, tempflightplan->actdeptime, tempflightplan->hrsenroute, tempflightplan->minenroute, tempflightplan->hrsfuel, tempflightplan->minfuel, tempflightplan->altairport, tempflightplan->remarks, tempflightplan->route);
                   else
-                     sprintf(dataseg,"%s::::::::::::::::", dataseg);
+                     sprintf(dataseg,"%s:::::::::::::::::", dataseg);
                   sprintf(dataseg,"%s::::::%s", dataseg, sprintgmt(tempclient->starttime,s));
                   fprintf(wzfile,"%s\n", dataseg);
                }
