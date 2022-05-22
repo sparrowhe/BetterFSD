@@ -130,42 +130,36 @@ void fsd::dochecks()
                int servers=0;
                for (tempserver=rootserver;tempserver;tempserver=tempserver->next)
                   servers++;
-               fprintf(wzfile,"!GENERAL\nversion = %d\nreload = %d\nlastupdate = %s\nclients = %d\nservers = %d\n!FORMAT\ntype:callsign:realname:cid:rating:visualrange:serverident:protocol:lat:lng:altitdue:groundspeed:frequency:pbh:transponder:facilitytype:aircraft:tascruise:depairport:alt:destairport:revision:type:deptime:actdeptime:hrsenroute:minenroute:hrsfuel:minfuel:altairport:remarks:route::::::starttime\nident:hostname:location:name:slient\n!CLIENTS\n", 1, 1, sprintgmt(now, s), clients, servers);
-               char dataseg[3000];
+               char dataseg[5120];
+               fprintf(wzfile,"{\"version\":%d,\"reload\":%d,\"lastupdate\":\"%s\",\"clients\":\"%d\",\"servers\":%d,\"clients\":[", 1, 1, sprintgmt(now, s), clients, servers);
                for (tempclient=rootclient;tempclient;tempclient=tempclient->next)
                {
                   //Public
-                  sprintf(dataseg,"%s:%s:%s:%s:%d:%d:%s:%s", tempclient->type==CLIENT_ATC?"ATC":"PILOT", tempclient->callsign, tempclient->realname, tempclient->cid, tempclient->rating, tempclient->visualrange, tempclient->location->ident, tempclient->protocol);
+                  sprintf(dataseg,"{\"type\":\"%s\",\"callsign\":\"%s\",\"realname\":\"%s\",\"cid\":\"%s\",\"rating\":%d,\"visualrange\":%d,\"ident\":\"%s\",\"protocol\":%s", tempclient->type==CLIENT_ATC?"ATC":"PILOT", tempclient->callsign, tempclient->realname, tempclient->cid, tempclient->rating, tempclient->visualrange, tempclient->location->ident, tempclient->protocol);
                   if (tempclient->lat!=0 && tempclient->altitude < 100000 && tempclient->lon != 0)
-                     sprintf(dataseg,"%s:%f:%f:%d:%d", dataseg, tempclient->lat, tempclient->lon, tempclient->altitude, tempclient->groundspeed);
-                  else
-                     sprintf(dataseg,"%s::::", dataseg);
+                     sprintf(dataseg,"%s,\"latlng\":[%f,%f],\"altitude\":%d,\"groundspeed\":%d", dataseg, tempclient->lat, tempclient->lon, tempclient->altitude, tempclient->groundspeed);
                   //ATC
                   if (tempclient->frequency!=0 && tempclient->frequency<100000 && tempclient && tempclient->type==CLIENT_ATC)
-                     sprintf(dataseg,"%s:1%02d.%03d", dataseg, tempclient->frequency/1000, tempclient->frequency%1000);
-                  else
-                     sprintf(dataseg,"%s:", dataseg);
+                     sprintf(dataseg,"%s,\"frequency\":1%02d.%03d", dataseg, tempclient->frequency/1000, tempclient->frequency%1000);
                   //PILOT
-                  if (tempclient->type==CLIENT_PILOT)
-                     sprintf(dataseg,"%s:%u:%d:%d:", dataseg, tempclient->pbh, tempclient->transponder, tempclient->facilitytype);
-                  else
-                     sprintf(dataseg,"%s::::", dataseg);
-                  tempflightplan=tempclient->plan;
-                  if (tempflightplan && tempclient->type==CLIENT_PILOT)
-                     sprintf(dataseg,"%s:%s:%d:%s:%s:%s:%d:%c:%d:%d:%d:%d:%d:%d:%s:%s:%s:", dataseg, tempflightplan->aircraft, tempflightplan->tascruise, tempflightplan->depairport, tempflightplan->alt, tempflightplan->destairport, tempflightplan->revision, tempflightplan->type, tempflightplan->deptime, tempflightplan->actdeptime, tempflightplan->hrsenroute, tempflightplan->minenroute, tempflightplan->hrsfuel, tempflightplan->minfuel, tempflightplan->altairport, tempflightplan->remarks, tempflightplan->route);
-                  else
-                     sprintf(dataseg,"%s:::::::::::::::::", dataseg);
-                  sprintf(dataseg,"%s::::::%s", dataseg, sprintgmt(tempclient->starttime,s));
-                  fprintf(wzfile,"%s\n", dataseg);
+                  if (tempclient->type==CLIENT_PILOT) {
+                     sprintf(dataseg,"%s,\"pbh\":%u,\"transponder\":%d,\"facilitytype\":%d", dataseg, tempclient->pbh, tempclient->transponder, tempclient->facilitytype);
+                     tempflightplan=tempclient->plan;
+                     if (tempflightplan)
+                        sprintf(dataseg,"%s,\"plan\":{\"aircraft\":\"%s\",\"tascruise\":%d,\"depairport\":\"%s\",\"alt\":\"%s\",\"destairport\":\"%s\",\"revision\":%d,\"type\":\"%c\",\"deptime\":%d,\"actdeptime\":%d,\"hrsenroute\":%d,\"minenroute\":%d,\"hrsfuel\":%d,\"minfuel\":%d,\"altairport\":%s,\"remarks\":\"%s\",\"route\":\"%s\"}", dataseg, tempflightplan->aircraft, tempflightplan->tascruise, tempflightplan->depairport, tempflightplan->alt, tempflightplan->destairport, tempflightplan->revision, tempflightplan->type, tempflightplan->deptime, tempflightplan->actdeptime, tempflightplan->hrsenroute, tempflightplan->minenroute, tempflightplan->hrsfuel, tempflightplan->minfuel, tempflightplan->altairport, tempflightplan->remarks, tempflightplan->route);
+                  }
+                  sprintf(dataseg,"%s,\"starttime\":%s}", dataseg, sprintgmt(tempclient->starttime,s));
+                  fprintf(wzfile,"%s,", dataseg);
                }
-               char dataline[150]; 
-               fprintf(wzfile,"!SERVERS\n");
+               fprintf(wzfile,"null],\"servers\":[");
+               char dataline[320]; 
                for (tempserver=rootserver;tempserver;tempserver=tempserver->next)
                   if (strcmp(tempserver->hostname,"n/a") != 0)
                   {
-                     sprintf(dataline,"%s:%s:%s:%s:%d", tempserver->ident, tempserver->hostname, tempserver->location, tempserver->name, tempserver->flags&SERVER_SILENT?0:1);
-                     fprintf(wzfile,"%s\n",dataline);
-                  }; 
+                     sprintf(dataline,"{\"ident\":\"%s\",\"hostname\":\"%s\",\"location\":\"%s\",\"name\":\"%s\",\"slient\":%d}", tempserver->ident, tempserver->hostname, tempserver->location, tempserver->name, tempserver->flags&SERVER_SILENT?0:1);
+                     fprintf(wzfile,"%s,",dataline);
+                  };
+               fprintf(wzfile,"null]}");
                fclose(wzfile);
       			   remove(whazzupfile);
                rename(whazzuptemp, whazzupfile);
