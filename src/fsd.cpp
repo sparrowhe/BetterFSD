@@ -123,45 +123,50 @@ void fsd::dochecks()
                //Ready to write data
                fileopen = 1;
                char s[32];
+			   fprintf(wzfile,"%s%s\n","![DateStamp]",sprintgmtdate(now,s));
+               fprintf(wzfile,"%s\n","!GENERAL");
+               fprintf(wzfile,"%s = %d\n", "VERSION", 1);
+               fprintf(wzfile,"%s = %d\n", "RELOAD", 1);
+               fprintf(wzfile,"%s = %s\n", "UPDATE", sprintgmt(now, s));
                client *tempclient;
                flightplan *tempflightplan;
                server *tempserver;
                int clients=0;
                for (tempclient=rootclient;tempclient;tempclient=tempclient->next)
                   clients++;
+               fprintf(wzfile,"%s = %d\n", "CONNECTED CLIENTS", clients);
                int servers=0;
                for (tempserver=rootserver;tempserver;tempserver=tempserver->next)
                   servers++;
-               fprintf(wzfile,"!GENERAL\nversion = %d\nreload = %d\nlastupdate = %s\nclients = %d\nservers = %d\n!FORMAT\ntype:callsign:realname:cid:rating:visualrange:serverident:protocol:lat:lng:altitdue:groundspeed:frequency:pbh:transponder:facilitytype:aircraft:tascruise:depairport:alt:destairport:revision:type:deptime:actdeptime:hrsenroute:minenroute:hrsfuel:minfuel:altairport:remarks:route::::::starttime\nident:hostname:location:name:slient\n!CLIENTS\n", 1, 1, sprintgmt(now, s), clients, servers);
-               char dataseg[3000];
+               fprintf(wzfile,"%s = %d\n", "CONNECTED SERVERS", servers);
+               fprintf(wzfile,"%s\n","!CLIENTS");
+               char dataseg1[150]; char dataseg2[150]; char dataseg3[150]; char dataseg4[150]; char dataseg5[150]; char dataseg6[2000]; char dataseg7[50];
                for (tempclient=rootclient;tempclient;tempclient=tempclient->next)
                {
-                  //Public
-                  sprintf(dataseg,"%s:%s:%s:%s:%d:%d:%s:%s", tempclient->type==CLIENT_ATC?"ATC":"PILOT", tempclient->callsign, tempclient->realname, tempclient->cid, tempclient->rating, tempclient->visualrange, tempclient->location->ident, tempclient->protocol);
-                  if (tempclient->lat!=0 && tempclient->altitude < 100000 && tempclient->lon != 0)
-                     sprintf(dataseg,"%s:%f:%f:%d:%d", dataseg, tempclient->lat, tempclient->lon, tempclient->altitude, tempclient->groundspeed);
+                  sprintf(dataseg1,"%s:%s:%s:%s", tempclient->callsign, tempclient->cid, tempclient->realname, tempclient->type==CLIENT_ATC?"ATC":"PILOT");
+                  if (tempclient->frequency!=0 && tempclient->frequency<100000 && tempclient)
+                     sprintf(dataseg2,"1%02d.%03d", tempclient->frequency/1000, tempclient->frequency%1000);
                   else
-                     sprintf(dataseg,"%s::::", dataseg);
-                  //ATC
-                  if (tempclient->frequency!=0 && tempclient->frequency<100000 && tempclient && tempclient->type==CLIENT_ATC)
-                     sprintf(dataseg,"%s:1%02d.%03d", dataseg, tempclient->frequency/1000, tempclient->frequency%1000);
-                  else
-                     sprintf(dataseg,"%s:", dataseg);
-                  //PILOT
-                  if (tempclient->type==CLIENT_PILOT)
-                     sprintf(dataseg,"%s:%u:%d:%d:", dataseg, tempclient->pbh, tempclient->transponder, tempclient->facilitytype);
-                  else
-                     sprintf(dataseg,"%s::::", dataseg);
+                     sprintf(dataseg2,"%s","");
                   tempflightplan=tempclient->plan;
-                  if (tempflightplan && tempclient->type==CLIENT_PILOT)
-                     sprintf(dataseg,"%s:%s:%d:%s:%s:%s:%d:%c:%d:%d:%d:%d:%d:%d:%s:%s:%s:", dataseg, tempflightplan->aircraft, tempflightplan->tascruise, tempflightplan->depairport, tempflightplan->alt, tempflightplan->destairport, tempflightplan->revision, tempflightplan->type, tempflightplan->deptime, tempflightplan->actdeptime, tempflightplan->hrsenroute, tempflightplan->minenroute, tempflightplan->hrsfuel, tempflightplan->minfuel, tempflightplan->altairport, tempflightplan->remarks, tempflightplan->route);
+                  if (tempclient->lat!=0 && tempclient->altitude < 100000 && tempclient->lon != 0)
+                     sprintf(dataseg3,"%f:%f:%d:%d", tempclient->lat, tempclient->lon, tempclient->altitude, tempclient->groundspeed);
                   else
-                     sprintf(dataseg,"%s::::::::::::::::", dataseg);
-                  sprintf(dataseg,"%s::::::%s", dataseg, sprintgmt(tempclient->starttime,s));
-                  fprintf(wzfile,"%s\n", dataseg);
+                     sprintf(dataseg3,"%s",":::");
+                  if (tempflightplan)
+                     sprintf(dataseg4,"%s:%d:%s:%s:%s", tempflightplan->aircraft, tempflightplan->tascruise, tempflightplan->depairport, tempflightplan->alt, tempflightplan->destairport);
+                  else
+                     sprintf(dataseg4,"%s","::::");
+                  sprintf(dataseg5,"%s:%s:%d:%d:%d:%d", tempclient->location->ident, tempclient->protocol, tempclient->rating, tempclient->transponder, tempclient->facilitytype, tempclient->visualrange);
+                  if (tempflightplan)
+                     sprintf(dataseg6,"%d:%c:%d:%d:%d:%d:%d:%d:%s:%s:%s", tempflightplan->revision, tempflightplan->type, tempflightplan->deptime, tempflightplan->actdeptime, tempflightplan->hrsenroute, tempflightplan->minenroute, tempflightplan->hrsfuel, tempflightplan->minfuel, tempflightplan->altairport, tempflightplan->remarks, tempflightplan->route);
+                  else
+                     sprintf(dataseg6,"%s","::::::::::");
+                  sprintf(dataseg7,"::::::%s", sprintgmt(tempclient->starttime,s));
+                  fprintf(wzfile,"%s:%s:%s:%s:%s:%s:%s\n", dataseg1, dataseg2, dataseg3, dataseg4, dataseg5, dataseg6, dataseg7);
                }
                char dataline[150]; 
-               fprintf(wzfile,"!SERVERS\n");
+               fprintf(wzfile,"%s\n","!SERVERS");
                for (tempserver=rootserver;tempserver;tempserver=tempserver->next)
                   if (strcmp(tempserver->hostname,"n/a") != 0)
                   {
@@ -169,7 +174,7 @@ void fsd::dochecks()
                      fprintf(wzfile,"%s\n",dataline);
                   }; 
                fclose(wzfile);
-      			   remove(whazzupfile);
+			   remove(whazzupfile);
                rename(whazzuptemp, whazzupfile);
                fileopen=0;
             }
