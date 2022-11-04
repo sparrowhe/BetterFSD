@@ -40,6 +40,6 @@ jobs:
     - name: 'Upload Artifact'
       uses: actions/upload-artifact@v2
       with:
-          name: fsd
+          name: Betterfsd_linux_amd64
           path: ${{github.workspace}}/program_directory/unix/
           retention-days: 5
