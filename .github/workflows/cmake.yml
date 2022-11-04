@@ -35,7 +35,7 @@ jobs:
     - name: MV
       run: | 
        cd ${{github.workspace}}/build
-       mv fsd ${{github.workspace}}/unix/fsd
+       mv fsd ${{github.workspace}}/program_directory/unix/
       
     - name: 'Upload Artifact'
       uses: actions/upload-artifact@v2
