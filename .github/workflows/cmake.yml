@@ -41,5 +41,5 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
           name: fsd
-          path: ${{github.workspace}}/unix/
+          path: ${{github.workspace}}/program_directory/unix/
           retention-days: 5
