@@ -1,4 +1,5 @@
 # BetterFSD
+[![CMake](https://github.com/LinkTechTips/BetterFSD/actions/workflows/cmake.yml/badge.svg)](https://github.com/LinkTechTips/BetterFSD/actions/workflows/cmake.yml)
 
 ## 关于
 本项目是在"Marty Bochane's FSD 2"基础上修改而来的
