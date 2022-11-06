@@ -37,8 +37,6 @@ Ensure that the above steps can be reproduced 100% on most devices as far as pos
 
 ### 📄 日志信息(Log Information)
 <!--
-在程序内 设置 - 通用设置 - 存储空间 - 打开Logs文件夹 找到当天的日志，将文件上传或将关键部分写在此处，在内容的开始与结束上加上 ``` 单独作为一行，如下所示
-Set in the program - General Settings - storage space - open the logs folder to find the log of the day, upload the file or write the key part here, and add ``` to the beginning and end of the content as a separate line, as shown below
 
 ```
 你的日志内容
