@@ -15,6 +15,7 @@
 
 本项目基于Apache 2.0协议开源
 若要使用本项目 请给本项目一个star
+
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FLinkTechTips%2FBetterFSD.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2FLinkTechTips%2FBetterFSD?ref=badge_large)
 
 ## 已实现功能
