@@ -41,6 +41,6 @@ jobs:
           ls
           cmake --build . --target INSTALL --config release
           ls "${{env.prefix}}"
-          cd "${{env.prefix}}/bin"
+          cd "${{env.prefix}}"
           ls
           ./CMakePrj.exe
