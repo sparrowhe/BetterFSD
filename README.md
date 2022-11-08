@@ -1,6 +1,6 @@
 # BetterFSD
 [![Ubuntu](https://github.com/nlohmann/json/workflows/Ubuntu/badge.svg)](https://github.com/LinkTechTips/BetterFSD/actions?query=workflow%3AUbuntu)
-[![CMake](https://github.com/LinkTechTips/BetterFSD/actions/workflows/cmake.yml/badge.svg)](https://github.com/LinkTechTips/BetterFSD/actions/workflows/cmake-ubuntu.yml)
+[![CMake](https://github.com/LinkTechTips/BetterFSD/actions/workflows/cmake-ubuntu.yml/badge.svg)](https://github.com/LinkTechTips/BetterFSD/actions/workflows/cmake-ubuntu.yml)
 [![Language grade: C/C++](https://img.shields.io/lgtm/grade/cpp/g/nlohmann/json.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/LinkTechTips/BetterFSD/context:cpp)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/LinkTechTips/BetterFSD/blob/master/LICENSE)
 [![GitHub Issues](https://img.shields.io/github/issues/LinkTechTips/json.svg)](https://github.com/LinkTechTips/BetterFSD/issues)
