@@ -1,0 +1,47 @@
+name: cmake-windows
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+env:
+  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
+  BUILD_TYPE: Release
+  
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v2
+      - name: Display the path by pwsh
+        run: echo ${env:PATH}
+        shell: pwsh  
+      - name: Display github.workspace by pwsh
+        run: |
+          echo "github.workspace is ${{ github.workspace }}."  
+          ls ${{ github.workspace }}
+        shell: pwsh
+      - name: CMake Build
+        run: |
+          cd ${{ github.workspace }}
+          ls
+          mkdir build
+          cd build
+          cmake --version
+          cmake -DCMAKE_INSTALL_PREFIX=${{ github.workspace }} ../
+          ls
+        shell: pwsh
+      - name: CMake Install
+        env:
+          prefix: ${{ github.workspace }}
+        run: |
+          cd ${{ github.workspace }}/build
+          ls
+          cmake --build . --target INSTALL --config release
+          ls "${{env.prefix}}"
+          cd "${{env.prefix}}/bin"
+          ls
+          ./CMakePrj.exe
