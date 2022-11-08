@@ -4,6 +4,7 @@
 [![Language grade: C/C++](https://img.shields.io/lgtm/grade/cpp/g/nlohmann/json.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/LinkTechTips/BetterFSD/context:cpp)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/LinkTechTips/BetterFSD/blob/master/LICENSE)
 [![GitHub Issues](https://img.shields.io/github/issues/LinkTechTips/json.svg)](https://github.com/LinkTechTips/BetterFSD/issues)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FLinkTechTips%2FBetterFSD.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2FLinkTechTips%2FBetterFSD?ref=badge_shield)
 
 ## 关于
 本项目是在"Marty Bochane's FSD 2"基础上修改而来的
@@ -23,3 +24,7 @@
 ## 待实现功能
 * 使用mySQL作为cert数据库
 * Echo防崩溃
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FLinkTechTips%2FBetterFSD.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2FLinkTechTips%2FBetterFSD?ref=badge_large)
