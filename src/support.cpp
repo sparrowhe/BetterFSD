@@ -69,6 +69,7 @@ void dolog(int level, const char *string, ...)
       loctime->tm_hour,loctime->tm_min,loctime->tm_sec, sident,
       (level<L_WARNING)?"** ":"", buf);
    fprintf(logfile,"%s\n", buf2);
+   printf("%s\n", buf2);
    fclose(logfile);
    addlog(level, buf2);
 }
