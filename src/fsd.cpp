@@ -304,8 +304,6 @@ void fsd::configure()
          certfile=strdup(entry->getdata());
       if ((entry=sysgroup->getentry("whazzup"))!=NULL)
 		 whazzupfile=strdup(entry->getdata());
-       if ((entry=sysgroup->getentry("whazzupjson"))!=NULL)
-		 whazzupjsonfile=strdup(entry->getdata());
    }
    configmyserver();
    readcert();
