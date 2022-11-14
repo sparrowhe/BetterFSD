@@ -19,8 +19,8 @@
 	#define CLOSESOCKET(a) close(a) 
 #endif
 
-#define PRODUCT "BetterFSD Version0.21 By 4185 QQ:3174327625"
-#define VERSION "V0.21"
+#define PRODUCT "BetterFSD Version0.3 By 4185 QQ:3174327625"
+#define VERSION "V0.3"
 #define NEEDREVISION 9
 
 /*

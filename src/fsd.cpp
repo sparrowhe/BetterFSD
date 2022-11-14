@@ -185,6 +185,74 @@ void fsd::dochecks()
          }
       }
    }
+   if ((now-prevwhazzup)>=WHAZZUPCHECK)
+   {
+      configentry *entry;
+      configgroup *sysgroup=configman->getgroup("system");
+      if (sysgroup) if ((entry=sysgroup->getentry("whazzup"))!=NULL)
+      {
+         if (whazzupjsonfile) free(whazzupjsonfile);
+         whazzupjsonfile=strdup(entry->getdata());
+         char whazzupjsontemp[100];
+         sprintf(whazzupjsontemp,"%s%s", whazzupjsonfile, ".tmp");
+         prevwhazzup=now;
+         if (fileopen==0)
+         {
+            FILE *wzfile=fopen(whazzupjsontemp, "w");
+            if (wzfile)
+            {
+               //Ready to write data
+               fileopen = 1;
+               char s[32];
+               client *tempclient;
+               flightplan *tempflightplan;
+               server *tempserver;
+               int clients=0;
+               for (tempclient=rootclient;tempclient;tempclient=tempclient->next)
+                  clients++;
+               int servers=0;
+               for (tempserver=rootserver;tempserver;tempserver=tempserver->next)
+                  servers++;
+               char dataseg[5120];
+               fprintf(wzfile,"{\"version\":%d,\"reload\":%d,\"lastupdate\":\"%s\",\"clients\":\"%d\",\"servers\":%d,\"clients\":[", 1, 1, sprintgmt(now, s), clients, servers);
+               for (tempclient=rootclient;tempclient;tempclient=tempclient->next)
+               {
+                  //Public
+                  sprintf(dataseg,"{\"type\":\"%s\",\"callsign\":\"%s\",\"realname\":\"%s\",\"cid\":\"%s\",\"rating\":%d,\"visualrange\":%d,\"ident\":\"%s\",\"protocol\":%s", tempclient->type==CLIENT_ATC?"ATC":"PILOT", tempclient->callsign, tempclient->realname, tempclient->cid, tempclient->rating, tempclient->visualrange, tempclient->location->ident, tempclient->protocol);
+                  if (tempclient->lat!=0 && tempclient->altitude < 100000 && tempclient->lon != 0)
+                     sprintf(dataseg,"%s,\"latlng\":[%f,%f],\"altitude\":%d,\"groundspeed\":%d", dataseg, tempclient->lat, tempclient->lon, tempclient->altitude, tempclient->groundspeed);
+                  //ATC
+                  if (tempclient->frequency!=0 && tempclient->frequency<100000 && tempclient && tempclient->type==CLIENT_ATC)
+                     sprintf(dataseg,"%s,\"frequency\":1%02d.%03d", dataseg, tempclient->frequency/1000, tempclient->frequency%1000);
+                  //PILOT
+                  if (tempclient->type==CLIENT_PILOT) {
+                     sprintf(dataseg,"%s,\"pbh\":%u,\"transponder\":%d,\"facilitytype\":%d", dataseg, tempclient->pbh, tempclient->transponder, tempclient->facilitytype);
+                     tempflightplan=tempclient->plan;
+                     if (tempflightplan)
+                        sprintf(dataseg,"%s,\"plan\":{\"aircraft\":\"%s\",\"tascruise\":%d,\"depairport\":\"%s\",\"alt\":\"%s\",\"destairport\":\"%s\",\"revision\":%d,\"type\":\"%c\",\"deptime\":%d,\"actdeptime\":%d,\"hrsenroute\":%d,\"minenroute\":%d,\"hrsfuel\":%d,\"minfuel\":%d,\"altairport\":\"%s\",\"remarks\":\"%s\",\"route\":\"%s\"}", dataseg, tempflightplan->aircraft, tempflightplan->tascruise, tempflightplan->depairport, tempflightplan->alt, tempflightplan->destairport, tempflightplan->revision, tempflightplan->type, tempflightplan->deptime, tempflightplan->actdeptime, tempflightplan->hrsenroute, tempflightplan->minenroute, tempflightplan->hrsfuel, tempflightplan->minfuel, tempflightplan->altairport, tempflightplan->remarks, tempflightplan->route);
+                  }
+                  sprintf(dataseg,"%s,\"starttime\":%s}", dataseg, sprintgmt(tempclient->starttime,s));
+                  fprintf(wzfile,"%s,", dataseg);
+               }
+               fprintf(wzfile,"null],\"servers\":[");
+               char dataline[320]; 
+               for (tempserver=rootserver;tempserver;tempserver=tempserver->next)
+                  if (strcmp(tempserver->hostname,"n/a") != 0)
+                  {
+                     sprintf(dataline,"{\"ident\":\"%s\",\"hostname\":\"%s\",\"location\":\"%s\",\"name\":\"%s\",\"slient\":%d}", tempserver->ident, tempserver->hostname, tempserver->location, tempserver->name, tempserver->flags&SERVER_SILENT?0:1);
+                     fprintf(wzfile,"%s,",dataline);
+                  };
+               fprintf(wzfile,"null]}");
+               fclose(wzfile);
+      			   remove(whazzupjsonfile);
+               rename(whazzupjsontemp, whazzupjsonfile);
+               fileopen=0;
+            }
+            else
+               fileopen=0;
+         }
+      }
+   }
 // WhazzUp End
    server *tempserver=rootserver;
    while (tempserver)
@@ -303,6 +371,8 @@ void fsd::configure()
          certfile=strdup(entry->getdata());
       if ((entry=sysgroup->getentry("whazzup"))!=NULL)
 		 whazzupfile=strdup(entry->getdata());
+       if ((entry=sysgroup->getentry("whazzupjson"))!=NULL)
+		 whazzupjsonfile=strdup(entry->getdata());
    }
    configmyserver();
    readcert();
