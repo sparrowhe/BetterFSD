@@ -24,7 +24,10 @@ add_executable(fsd
         src/sysuser.cpp
         src/user.cpp
         src/wprofile.cpp)
-        
+
+if(msvc)
+        target_compile_definitions(fsd PRIVATE WIN32)
+endif(msvc)
         
 set_property(TARGET fsd PROPERTY CMAKE_CXX_STANDARD 17)
 set_property(TARGET fsd PROPERTY CMAKE_CXX_STANDARD_REQUIRED ON)
