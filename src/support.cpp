@@ -51,7 +51,13 @@ void addfile(char *name, char *string,...)
 void dolog(int level, const char *string, ...)
 {
    char buf[1000], buf2[1200];
-   time_t secs=time(NULL);
+
+   #ifdef WIN32
+      time_t secs=time(NULL);
+   #else
+      long secs=time(NULL);
+   #endif
+   
    struct tm *loctime;
    static int firsttime=1;
    FILE *logfile=fopen(LOGFILE,"a");
@@ -69,7 +75,6 @@ void dolog(int level, const char *string, ...)
       loctime->tm_hour,loctime->tm_min,loctime->tm_sec, sident,
       (level<L_WARNING)?"** ":"", buf);
    fprintf(logfile,"%s\n", buf2);
-   printf("%s\n", buf2);
    fclose(logfile);
    addlog(level, buf2);
 }
