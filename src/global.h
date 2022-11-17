@@ -12,11 +12,13 @@
 	#define READSOCK(a,b,c) recv(a,b,c,0) 
 	#define socklen_t	int
 	#define CLOSESOCKET(a) closesocket(a) 
+	#pragma comment(lib,"ws2_32.lib")
+	#define M_PI 3.14159265358
 #else
 	#define STRCASECMP(a,b)	strcasecmp(a,b)
 	#define WRITESOCK(a,b,c) write(a,b,c) 
 	#define READSOCK(a,b,c) read(a,b,c) 
-	#define CLOSESOCKET(a) close(a) 
+	#define CLOSESOCKET(a) close(a)
 #endif
 
 #define PRODUCT "BetterFSD Version0.3 By 4185 QQ:3174327625"
