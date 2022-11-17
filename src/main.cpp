@@ -20,8 +20,10 @@ void run(char *configfile)
 }
 void dosignals()
 {
+#ifndef WIN32
    signal(SIGPIPE, SIG_IGN);
    signal(SIGHUP, SIG_IGN);
+#endif
 }
 
 #ifdef WIN32
